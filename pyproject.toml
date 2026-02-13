@@ -1,0 +1,24 @@
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "T20", "G"]
+
+[tool.ruff.lint.isort]
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "djangorestframework",
+  "django",
+  "first-party",
+  "local-folder",
+]
+
+[tool.ruff.lint.isort.sections]
+"djangorestframework" = ["rest_framework", "rest_framework_simplejwt"]
+"django" = ["django"]
+
+[tool.ruff.lint.per-file-ignores]
+"settings/env/*.py" = ["F403", "F405"]

@@ -6,21 +6,28 @@ from pathlib import Path
 
 from decouple import Config, RepositoryEnv
 
+SETTINGS_DIR_NAME = 'settings'
+ENV_FILE_NAME = '.env'
+DEFAULT_ENV_ID = 'local'
+ENV_ID_KEY = 'BLOG_ENV_ID'
+DJANGO_SETTINGS_MODULE_KEY = 'DJANGO_SETTINGS_MODULE'
+SETTINGS_MODULE_TEMPLATE = 'settings.env.{env_id}'
+
 
 def get_settings_module() -> str:
-    env_file = Path(__file__).resolve().parent / 'settings' / '.env'
-    env_id = 'local'
+    env_file = Path(__file__).resolve().parent / SETTINGS_DIR_NAME / ENV_FILE_NAME
+    env_id = DEFAULT_ENV_ID
 
     if env_file.exists():
         env_config = Config(RepositoryEnv(str(env_file)))
-        env_id = env_config('BLOG_ENV_ID', default='local')
+        env_id = env_config(ENV_ID_KEY, default=DEFAULT_ENV_ID)
 
-    return f'settings.env.{env_id}'
+    return SETTINGS_MODULE_TEMPLATE.format(env_id=env_id)
 
 
-def main():
+def main() -> None:
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', get_settings_module())
+    os.environ.setdefault(DJANGO_SETTINGS_MODULE_KEY, get_settings_module())
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
