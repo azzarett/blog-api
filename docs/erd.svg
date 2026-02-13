@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="760" viewBox="0 0 1300 760">
+  <defs>
+    <style>
+      .title { font: 700 18px Arial, sans-serif; fill: #111827; }
+      .box-title { font: 700 16px Arial, sans-serif; fill: #111827; }
+      .field { font: 13px Arial, sans-serif; fill: #1f2937; }
+      .pk { fill: #065f46; }
+      .fk { fill: #1d4ed8; }
+      .line { stroke: #4b5563; stroke-width: 2; }
+      .box { fill: #f9fafb; stroke: #374151; stroke-width: 2; rx: 8; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4b5563" />
+    </marker>
+  </defs>
+
+  <text x="24" y="34" class="title">Blog API ERD</text>
+
+  <rect x="30" y="60" width="360" height="260" class="box" />
+  <text x="50" y="88" class="box-title">users_user</text>
+  <text x="50" y="114" class="field pk">PK  id : BigAutoField</text>
+  <text x="50" y="136" class="field">email : EmailField(unique)</text>
+  <text x="50" y="158" class="field">first_name : CharField(50)</text>
+  <text x="50" y="180" class="field">last_name : CharField(50)</text>
+  <text x="50" y="202" class="field">is_active : BooleanField</text>
+  <text x="50" y="224" class="field">is_staff : BooleanField</text>
+  <text x="50" y="246" class="field">date_joined : DateTimeField</text>
+  <text x="50" y="268" class="field">avatar : ImageField(null, blank)</text>
+
+  <rect x="480" y="60" width="320" height="170" class="box" />
+  <text x="500" y="88" class="box-title">blog_category</text>
+  <text x="500" y="114" class="field pk">PK  id : BigAutoField</text>
+  <text x="500" y="136" class="field">name : CharField(100, unique)</text>
+  <text x="500" y="158" class="field">slug : SlugField(unique)</text>
+
+  <rect x="900" y="60" width="320" height="170" class="box" />
+  <text x="920" y="88" class="box-title">blog_tag</text>
+  <text x="920" y="114" class="field pk">PK  id : BigAutoField</text>
+  <text x="920" y="136" class="field">name : CharField(50, unique)</text>
+  <text x="920" y="158" class="field">slug : SlugField(unique)</text>
+
+  <rect x="430" y="320" width="410" height="290" class="box" />
+  <text x="450" y="348" class="box-title">blog_post</text>
+  <text x="450" y="374" class="field pk">PK  id : BigAutoField</text>
+  <text x="450" y="396" class="field fk">FK  author_id → users_user.id (CASCADE)</text>
+  <text x="450" y="418" class="field fk">FK  category_id → blog_category.id (SET_NULL, null)</text>
+  <text x="450" y="440" class="field">title : CharField(200)</text>
+  <text x="450" y="462" class="field">slug : SlugField(unique)</text>
+  <text x="450" y="484" class="field">body : TextField</text>
+  <text x="450" y="506" class="field">status : TextChoices(draft, published)</text>
+  <text x="450" y="528" class="field">created_at : DateTimeField</text>
+  <text x="450" y="550" class="field">updated_at : DateTimeField</text>
+  <text x="450" y="572" class="field">M2M tags ↔ blog_tag (through table)</text>
+
+  <rect x="900" y="320" width="320" height="210" class="box" />
+  <text x="920" y="348" class="box-title">blog_comment</text>
+  <text x="920" y="374" class="field pk">PK  id : BigAutoField</text>
+  <text x="920" y="396" class="field fk">FK  post_id → blog_post.id (CASCADE)</text>
+  <text x="920" y="418" class="field fk">FK  author_id → users_user.id (CASCADE)</text>
+  <text x="920" y="440" class="field">body : TextField</text>
+  <text x="920" y="462" class="field">created_at : DateTimeField</text>
+
+  <line x1="390" y1="210" x2="430" y2="400" class="line" marker-end="url(#arrow)" />
+  <line x1="640" y1="230" x2="640" y2="320" class="line" marker-end="url(#arrow)" />
+  <line x1="900" y1="420" x2="840" y2="420" class="line" marker-end="url(#arrow)" />
+  <line x1="390" y1="250" x2="900" y2="430" class="line" marker-end="url(#arrow)" />
+
+  <line x1="900" y1="190" x2="840" y2="520" class="line" marker-end="url(#arrow)" />
+
+  <text x="24" y="728" class="field">Relations: User 1-N Post, User 1-N Comment, Category 1-N Post (optional), Post N-M Tag, Post 1-N Comment</text>
+</svg>

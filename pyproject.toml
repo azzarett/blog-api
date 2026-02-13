@@ -22,3 +22,4 @@ section-order = [
 
 [tool.ruff.lint.per-file-ignores]
 "settings/env/*.py" = ["F403", "F405"]
+"**/migrations/*.py" = ["E501"]
