@@ -1,8 +1,12 @@
+from rest_framework_nested.routers import NestedDefaultRouter
+
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
+from apps.blog.views import CommentViewSet, PostViewSet
 from apps.users.views import RegisterViewSet
 
 ADMIN_PATH = 'admin/'
@@ -15,6 +19,15 @@ TOKEN_REFRESH_NAME = 'auth_token_refresh'
 
 REGISTER_ACTION_MAP = {'post': 'create'}
 
+POSTS_ROUTER_PREFIX = 'api/posts'
+COMMENTS_ROUTER_PREFIX = 'comments'
+
+router = DefaultRouter()
+router.register(POSTS_ROUTER_PREFIX, PostViewSet, basename='post')
+
+posts_router = NestedDefaultRouter(router, POSTS_ROUTER_PREFIX, lookup='post')
+posts_router.register(COMMENTS_ROUTER_PREFIX, CommentViewSet, basename='post-comments')
+
 urlpatterns = [
     path(ADMIN_PATH, admin.site.urls),
     path(
@@ -24,4 +37,6 @@ urlpatterns = [
     ),
     path(TOKEN_OBTAIN_PATH, TokenObtainPairView.as_view(), name=TOKEN_OBTAIN_NAME),
     path(TOKEN_REFRESH_PATH, TokenRefreshView.as_view(), name=TOKEN_REFRESH_NAME),
+    path('', include(router.urls)),
+    path('', include(posts_router.urls)),
 ]
