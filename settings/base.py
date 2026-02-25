@@ -18,6 +18,7 @@ DJANGO_MESSAGES_APP = 'django.contrib.messages'
 DJANGO_STATICFILES_APP = 'django.contrib.staticfiles'
 
 DRF_APP = 'rest_framework'
+DRF_SPECTACULAR_APP = 'drf_spectacular'
 USERS_APP = 'apps.users'
 BLOG_APP = 'apps.blog'
 
@@ -30,6 +31,7 @@ STATIC_URL_PATH = 'static/'
 DEFAULT_AUTO_FIELD_CLASS = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL_PATH = 'users.User'
 JWT_AUTH_CLASS = 'rest_framework_simplejwt.authentication.JWTAuthentication'
+SPECTACULAR_AUTO_SCHEMA_CLASS = 'drf_spectacular.openapi.AutoSchema'
 PAGE_NUMBER_PAGINATION_CLASS = 'rest_framework.pagination.PageNumberPagination'
 DEFAULT_PAGE_SIZE = 10
 SUPPORTED_LANGUAGES = [
@@ -66,6 +68,7 @@ INSTALLED_APPS = [
     DJANGO_MESSAGES_APP,
     DJANGO_STATICFILES_APP,
     DRF_APP,
+    DRF_SPECTACULAR_APP,
     USERS_APP,
     BLOG_APP,
 ]
@@ -132,6 +135,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         JWT_AUTH_CLASS,
     ),
+    'DEFAULT_SCHEMA_CLASS': SPECTACULAR_AUTO_SCHEMA_CLASS,
     'DEFAULT_PAGINATION_CLASS': PAGE_NUMBER_PAGINATION_CLASS,
     'PAGE_SIZE': DEFAULT_PAGE_SIZE,
 }
@@ -150,3 +154,22 @@ CACHES = {
 
 EMAIL_BACKEND = BLOG_EMAIL_BACKEND
 DEFAULT_FROM_EMAIL = BLOG_DEFAULT_FROM_EMAIL
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Blog API',
+    'DESCRIPTION': (
+        'API documentation for Blog API with localization, auth, posts, '
+        'comments, and stats.'
+    ),
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'TAGS': [
+        {
+            'name': 'Auth',
+            'description': 'Authentication and user preference endpoints.',
+        },
+        {'name': 'Posts', 'description': 'Post listing and post management endpoints.'},
+        {'name': 'Comments', 'description': 'Nested comment endpoints for posts.'},
+        {'name': 'Stats', 'description': 'Aggregated blog statistics endpoint.'},
+    ],
+}

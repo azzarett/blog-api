@@ -136,3 +136,27 @@ class CommentWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('body',)
+
+
+class PaginatedPostListSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.URLField(allow_null=True)
+    previous = serializers.URLField(allow_null=True)
+    results = PostListSerializer(many=True)
+
+
+class PaginatedCommentListSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.URLField(allow_null=True)
+    previous = serializers.URLField(allow_null=True)
+    results = CommentSerializer(many=True)
+
+
+class StatsSerializer(serializers.Serializer):
+    users = serializers.IntegerField()
+    posts_total = serializers.IntegerField()
+    posts_published = serializers.IntegerField()
+    posts_draft = serializers.IntegerField()
+    comments = serializers.IntegerField()
+    categories = serializers.IntegerField()
+    tags = serializers.IntegerField()

@@ -100,3 +100,57 @@ class UpdateTimezoneSerializer(serializers.Serializer):
             ) from exc
 
         return normalized_value
+
+
+class MessageSerializer(serializers.Serializer):
+    message = serializers.CharField()
+
+
+class UpdateLanguageResponseSerializer(MessageSerializer):
+    preferred_language = serializers.ChoiceField(choices=User.Language.choices)
+
+
+class UpdateTimezoneResponseSerializer(MessageSerializer):
+    timezone = serializers.CharField()
+
+
+class ErrorDetailSerializer(serializers.Serializer):
+    detail = serializers.CharField()
+
+
+class ValidationErrorResponseSerializer(serializers.Serializer):
+    non_field_errors = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+    )
+    email = serializers.ListField(child=serializers.CharField(), required=False)
+    first_name = serializers.ListField(child=serializers.CharField(), required=False)
+    last_name = serializers.ListField(child=serializers.CharField(), required=False)
+    password = serializers.ListField(child=serializers.CharField(), required=False)
+    password_confirm = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+    )
+    preferred_language = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+    )
+    timezone = serializers.ListField(child=serializers.CharField(), required=False)
+
+
+class TokenObtainRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+
+class TokenResponseSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    access = serializers.CharField()
+
+
+class TokenRefreshRequestSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+
+class TokenRefreshResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
