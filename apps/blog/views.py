@@ -1,10 +1,16 @@
 # pyright: reportIncompatibleMethodOverride=false
 
+import hashlib
+
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
+from django.core.cache import cache
 from django.db.models import Q
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 
 from apps.blog.models import Comment, Post
 from apps.blog.permissions import IsAuthorOrReadOnly
@@ -31,6 +37,8 @@ WRITE_ACTIONS = {
     PARTIAL_UPDATE_ACTION,
     DESTROY_ACTION,
 }
+POSTS_LIST_CACHE_VERSION_KEY = 'posts:list:version'
+POSTS_LIST_CACHE_TIMEOUT_SECONDS = 300
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -67,6 +75,31 @@ class PostViewSet(viewsets.ModelViewSet):
             return PostWriteSerializer
         return PostDetailSerializer
 
+    def list(self, request, *args, **kwargs) -> Response:
+        cache_key = self._build_posts_list_cache_key(request)
+        cached_payload = cache.get(cache_key)
+        if cached_payload is not None:
+            return Response(cached_payload)
+
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout=POSTS_LIST_CACHE_TIMEOUT_SECONDS)
+        return response
+
+    def _build_posts_list_cache_key(self, request) -> str:
+        language = (get_language() or 'en').split('-', 1)[0]
+        timezone_name = 'utc'
+        if request.user.is_authenticated and getattr(request.user, 'timezone', None):
+            timezone_name = request.user.timezone
+
+        cache_version = cache.get(POSTS_LIST_CACHE_VERSION_KEY, 1)
+        query_string = request.META.get('QUERY_STRING', '')
+        query_hash = hashlib.md5(query_string.encode('utf-8')).hexdigest()
+
+        return (
+            f'posts:list:v{cache_version}:lang:{language}:'
+            f'tz:{timezone_name}:q:{query_hash}'
+        )
+
     def perform_create(self, serializer) -> None:
         serializer.save(author=self.request.user)
 
@@ -93,7 +126,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         try:
             return queryset.get(slug=post_slug)
         except Post.DoesNotExist as exc:
-            raise NotFound('Post not found.') from exc
+            raise NotFound(_('Post not found.')) from exc
 
     def get_queryset(self):
         post = self._get_visible_post()

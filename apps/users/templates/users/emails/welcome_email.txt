@@ -1,0 +1,3 @@
+{% load i18n %}{% blocktrans with first_name=user.first_name %}Hello {{ first_name }},{% endblocktrans %}
+
+{% trans "Thank you for registering at Blog API." %}

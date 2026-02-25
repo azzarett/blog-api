@@ -1,0 +1,70 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: blog-api\n"
+"POT-Creation-Date: 2026-02-25 00:00+0000\n"
+"PO-Revision-Date: 2026-02-25 00:00+0000\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Passwords do not match."
+msgstr "Құпиясөздер сәйкес келмейді."
+
+msgid "Invalid timezone. Use a valid IANA timezone identifier, e.g. 'Asia/Almaty'."
+msgstr "Уақыт белдеуі қате. Дұрыс IANA идентификаторын қолданыңыз, мысалы 'Asia/Almaty'."
+
+msgid "Preferred language updated successfully."
+msgstr "Таңдаулы тіл сәтті жаңартылды."
+
+msgid "Timezone updated successfully."
+msgstr "Уақыт белдеуі сәтті жаңартылды."
+
+msgid "Post not found."
+msgstr "Жазба табылмады."
+
+msgid "First name"
+msgstr "Аты"
+
+msgid "Last name"
+msgstr "Тегі"
+
+msgid "Preferred language"
+msgstr "Таңдаулы тіл"
+
+msgid "Timezone"
+msgstr "Уақыт белдеуі"
+
+msgid "Category name (English)"
+msgstr "Санат атауы (ағылшынша)"
+
+msgid "Category name (Russian)"
+msgstr "Санат атауы (орысша)"
+
+msgid "Category name (Kazakh)"
+msgstr "Санат атауы (қазақша)"
+
+msgid "Title"
+msgstr "Тақырып"
+
+msgid "Body"
+msgstr "Мазмұны"
+
+msgid "Status"
+msgstr "Күйі"
+
+msgid "Created at"
+msgstr "Жасалған уақыты"
+
+msgid "Updated at"
+msgstr "Жаңартылған уақыты"
+
+msgid "Welcome to Blog API!"
+msgstr "Blog API-ге қош келдіңіз!"
+
+msgid "Hello %(first_name)s,"
+msgstr "Сәлем, %(first_name)s,"
+
+msgid "Thank you for registering at Blog API."
+msgstr "Blog API-де тіркелгеніңізге рақмет."

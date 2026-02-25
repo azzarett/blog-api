@@ -1,6 +1,14 @@
 from datetime import timedelta
 
-from settings.conf import BLOG_ALLOWED_HOSTS, BLOG_SECRET_KEY, BLOG_TIME_ZONE
+from settings.conf import (
+    BASE_DIR,
+    BLOG_ALLOWED_HOSTS,
+    BLOG_DEFAULT_FROM_EMAIL,
+    BLOG_EMAIL_BACKEND,
+    BLOG_REDIS_URL,
+    BLOG_SECRET_KEY,
+    BLOG_TIME_ZONE,
+)
 
 DJANGO_ADMIN_APP = 'django.contrib.admin'
 DJANGO_AUTH_APP = 'django.contrib.auth'
@@ -17,13 +25,18 @@ ROOT_URLCONF_MODULE = 'settings.urls'
 WSGI_APPLICATION_MODULE = 'settings.wsgi.application'
 ASGI_APPLICATION_MODULE = 'settings.asgi.application'
 
-DEFAULT_LANGUAGE_CODE = 'en-us'
+DEFAULT_LANGUAGE_CODE = 'en'
 STATIC_URL_PATH = 'static/'
 DEFAULT_AUTO_FIELD_CLASS = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL_PATH = 'users.User'
 JWT_AUTH_CLASS = 'rest_framework_simplejwt.authentication.JWTAuthentication'
 PAGE_NUMBER_PAGINATION_CLASS = 'rest_framework.pagination.PageNumberPagination'
 DEFAULT_PAGE_SIZE = 10
+SUPPORTED_LANGUAGES = [
+    ('en', 'English'),
+    ('ru', 'Russian'),
+    ('kk', 'Kazakh'),
+]
 
 USER_ATTRIBUTE_SIMILARITY_VALIDATOR = (
     'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
@@ -60,6 +73,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'apps.users.middleware.UserLocaleTimezoneMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -103,6 +117,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = DEFAULT_LANGUAGE_CODE
+LANGUAGES = SUPPORTED_LANGUAGES
+LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = BLOG_TIME_ZONE
 USE_I18N = True
 USE_TZ = True
@@ -124,3 +140,13 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=ACCESS_TOKEN_LIFETIME_MINUTES),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=REFRESH_TOKEN_LIFETIME_DAYS),
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': BLOG_REDIS_URL,
+    }
+}
+
+EMAIL_BACKEND = BLOG_EMAIL_BACKEND
+DEFAULT_FROM_EMAIL = BLOG_DEFAULT_FROM_EMAIL
