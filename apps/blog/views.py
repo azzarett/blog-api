@@ -1,5 +1,6 @@
 # pyright: reportIncompatibleMethodOverride=false
 
+import asyncio
 import hashlib
 
 from drf_spectacular.utils import (
@@ -9,6 +10,7 @@ from drf_spectacular.utils import (
     extend_schema,
     extend_schema_view,
 )
+import httpx
 
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
@@ -22,7 +24,7 @@ from django.db.models import Q
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
-from apps.blog.models import Category, Comment, Post, Tag
+from apps.blog.models import Comment, Post
 from apps.blog.permissions import IsAuthorOrReadOnly
 from apps.blog.serializers import (
     CommentSerializer,
@@ -669,17 +671,23 @@ class CommentViewSet(viewsets.ModelViewSet):
 class StatsAPIView(APIView):
     permission_classes = (AllowAny,)
 
+    EXCHANGE_RATES_URL = 'https://open.er-api.com/v6/latest/USD'
+    ALMATY_TIME_URL = (
+        'https://timeapi.io/api/time/current/zone?timeZone=Asia/Almaty'
+    )
+    HTTP_TIMEOUT_SECONDS = 10.0
+
     @extend_schema(
         tags=['Stats'],
-        summary='Get blog statistics',
+        summary='Get blog and external statistics',
         description=(
-            'Returns aggregate counters for users, posts, comments, categories and '
-            'tags. Authentication is not required. Endpoint is read-only and has no '
-            'side effects on cache/email. Language and timezone do not affect numeric '
-            'results.'
+            'Returns local blog counters together with exchange rates and current '
+            'Almaty time from external public APIs. External requests are executed '
+            'concurrently to reduce overall latency. Authentication is not required.'
         ),
         responses={
             200: StatsSerializer,
+            503: OpenApiResponse(response=ErrorDetailSerializer),
             429: OpenApiResponse(response=MessageSerializer),
         },
         examples=[
@@ -692,29 +700,60 @@ class StatsAPIView(APIView):
                 'Stats response',
                 response_only=True,
                 value={
-                    'users': 10,
-                    'posts_total': 25,
-                    'posts_published': 20,
-                    'posts_draft': 5,
-                    'comments': 120,
-                    'categories': 8,
-                    'tags': 15,
+                    'blog': {
+                        'total_posts': 42,
+                        'total_comments': 137,
+                        'total_users': 15,
+                    },
+                    'exchange_rates': {
+                        'KZT': 450.23,
+                        'RUB': 89.10,
+                        'EUR': 0.92,
+                    },
+                    'current_time': '2024-03-15T18:30:00+05:00',
                 },
             ),
         ],
     )
     def get(self, request, *args, **kwargs) -> Response:
-        published_count = Post.objects.filter(status=Post.Status.PUBLISHED).count()
-        total_count = Post.objects.count()
+        try:
+            exchange_rates, current_time = asyncio.run(self._fetch_external_data())
+        except (httpx.HTTPError, KeyError, ValueError):
+            return Response(
+                {'detail': _('Failed to fetch external statistics.')}, status=503
+            )
 
         return Response(
             {
-                'users': User.objects.count(),
-                'posts_total': total_count,
-                'posts_published': published_count,
-                'posts_draft': total_count - published_count,
-                'comments': Comment.objects.count(),
-                'categories': Category.objects.count(),
-                'tags': Tag.objects.count(),
+                'blog': {
+                    'total_posts': Post.objects.count(),
+                    'total_comments': Comment.objects.count(),
+                    'total_users': User.objects.count(),
+                },
+                'exchange_rates': exchange_rates,
+                'current_time': current_time,
             }
         )
+
+    async def _fetch_external_data(self) -> tuple[dict[str, float], str]:
+        async with httpx.AsyncClient(timeout=self.HTTP_TIMEOUT_SECONDS) as client:
+            exchange_response, time_response = await asyncio.gather(
+                client.get(self.EXCHANGE_RATES_URL),
+                client.get(self.ALMATY_TIME_URL),
+            )
+
+        exchange_response.raise_for_status()
+        time_response.raise_for_status()
+
+        exchange_payload = exchange_response.json()
+        time_payload = time_response.json()
+
+        rates = exchange_payload['rates']
+        exchange_rates = {
+            'KZT': float(rates['KZT']),
+            'RUB': float(rates['RUB']),
+            'EUR': float(rates['EUR']),
+        }
+        current_time = str(time_payload['dateTime'])
+
+        return exchange_rates, current_time

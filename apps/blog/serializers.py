@@ -153,10 +153,6 @@ class PaginatedCommentListSerializer(serializers.Serializer):
 
 
 class StatsSerializer(serializers.Serializer):
-    users = serializers.IntegerField()
-    posts_total = serializers.IntegerField()
-    posts_published = serializers.IntegerField()
-    posts_draft = serializers.IntegerField()
-    comments = serializers.IntegerField()
-    categories = serializers.IntegerField()
-    tags = serializers.IntegerField()
+    blog = serializers.DictField(child=serializers.IntegerField())
+    exchange_rates = serializers.DictField(child=serializers.FloatField())
+    current_time = serializers.CharField()
