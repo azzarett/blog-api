@@ -1,0 +1,9 @@
+Hi {{ user.first_name }},
+
+Welcome to Blog API.
+Your account {{ user.email }} is ready.
+
+You can now create posts, leave comments, and explore localized content.
+
+Best regards,
+Blog API Team

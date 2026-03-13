@@ -21,6 +21,7 @@ DRF_APP = 'rest_framework'
 DRF_SPECTACULAR_APP = 'drf_spectacular'
 USERS_APP = 'apps.users'
 BLOG_APP = 'apps.blog'
+CORE_APP = 'apps.core'
 
 ROOT_URLCONF_MODULE = 'settings.urls'
 WSGI_APPLICATION_MODULE = 'settings.wsgi.application'
@@ -69,6 +70,7 @@ INSTALLED_APPS = [
     DJANGO_STATICFILES_APP,
     DRF_APP,
     DRF_SPECTACULAR_APP,
+    CORE_APP,
     USERS_APP,
     BLOG_APP,
 ]
@@ -76,7 +78,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'apps.users.middleware.UserLocaleTimezoneMiddleware',
+    'apps.core.middleware.UserLocaleTimezoneMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -89,7 +91,7 @@ ROOT_URLCONF = ROOT_URLCONF_MODULE
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

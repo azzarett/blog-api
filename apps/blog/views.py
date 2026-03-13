@@ -11,6 +11,7 @@ from drf_spectacular.utils import (
     extend_schema_view,
 )
 import httpx
+from asgiref.sync import sync_to_async
 
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
@@ -715,20 +716,28 @@ class StatsAPIView(APIView):
             ),
         ],
     )
-    def get(self, request, *args, **kwargs) -> Response:
+    async def get(self, request, *args, **kwargs) -> Response:
+        # Async is used to overlap external HTTP I/O; synchronous calls would block
+        # the request thread and increase end-to-end latency under load.
         try:
-            exchange_rates, current_time = asyncio.run(self._fetch_external_data())
+            exchange_rates, current_time = await self._fetch_external_data()
         except (httpx.HTTPError, KeyError, ValueError):
             return Response(
                 {'detail': _('Failed to fetch external statistics.')}, status=503
             )
 
+        total_posts, total_comments, total_users = await asyncio.gather(
+            sync_to_async(Post.objects.count, thread_sensitive=True)(),
+            sync_to_async(Comment.objects.count, thread_sensitive=True)(),
+            sync_to_async(User.objects.count, thread_sensitive=True)(),
+        )
+
         return Response(
             {
                 'blog': {
-                    'total_posts': Post.objects.count(),
-                    'total_comments': Comment.objects.count(),
-                    'total_users': User.objects.count(),
+                    'total_posts': total_posts,
+                    'total_comments': total_comments,
+                    'total_users': total_users,
                 },
                 'exchange_rates': exchange_rates,
                 'current_time': current_time,

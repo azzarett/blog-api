@@ -5,8 +5,8 @@ from django.utils.translation import override
 
 def send_welcome_email(user) -> None:
     with override(user.preferred_language):
-        subject = render_to_string('users/emails/welcome_subject.txt').strip()
-        message = render_to_string('users/emails/welcome_email.txt', {'user': user})
+        subject = render_to_string('emails/welcome/subject.txt').strip()
+        message = render_to_string('emails/welcome/body.txt', {'user': user})
 
     send_mail(
         subject=subject,

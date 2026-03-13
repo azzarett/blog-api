@@ -11,6 +11,7 @@ env/
 *.sqlite3
 staticfiles/
 media/
+locale/*/LC_MESSAGES/*.mo
 
 # Logs
 logs/
