@@ -16,9 +16,9 @@ git checkout -b hw3-realtime-celery-docker
 
 ```bash
 source .venv/bin/activate
-python manage.py check
-python manage.py migrate
-python manage.py runserver
+./.venv/bin/python manage.py check
+./.venv/bin/python manage.py migrate
+./.venv/bin/python manage.py runserver
 ```
 
 3. Останови сервер и продолжай.
