@@ -49,11 +49,7 @@ pip install -r requirements/base.txt
 Добавь:
 
 ```env
-BLOG_REDIS_URL=redis://redis:6379/0
-BLOG_CELERY_BROKER_URL=redis://redis:6379/1
-BLOG_FLOWER_USER=admin
-BLOG_FLOWER_PASSWORD=changeme
-BLOG_SEED_DB=false
+w
 ```
 
 ### 1.3 Прочитай env в конфиге
