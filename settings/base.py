@@ -10,6 +10,8 @@ from settings.conf import (
     BLOG_TIME_ZONE,
 )
 
+CHANNELS = 'channels'
+
 DJANGO_ADMIN_APP = 'django.contrib.admin'
 DJANGO_AUTH_APP = 'django.contrib.auth'
 DJANGO_CONTENTTYPES_APP = 'django.contrib.contenttypes'
@@ -22,6 +24,7 @@ DRF_SPECTACULAR_APP = 'drf_spectacular'
 USERS_APP = 'apps.users'
 BLOG_APP = 'apps.blog'
 CORE_APP = 'apps.core'
+NOTIFICATIONS_APP = 'apps.notifications'
 
 ROOT_URLCONF_MODULE = 'settings.urls'
 WSGI_APPLICATION_MODULE = 'settings.wsgi.application'
@@ -73,6 +76,8 @@ INSTALLED_APPS = [
     CORE_APP,
     USERS_APP,
     BLOG_APP,
+    CHANNELS,
+    NOTIFICATIONS_APP,
 ]
 
 MIDDLEWARE = [
