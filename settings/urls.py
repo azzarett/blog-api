@@ -91,4 +91,5 @@ urlpatterns = [
     ),
     path('', include(router.urls)),
     path('', include(posts_router.urls)),
+    path('', include('apps.notifications.urls')),
 ]
