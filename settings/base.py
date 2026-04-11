@@ -57,6 +57,15 @@ NUMERIC_PASSWORD_VALIDATOR = (
     'django.contrib.auth.password_validation.NumericPasswordValidator'
 )
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [BLOG_REDIS_URL],
+        },
+    },
+}
+
 ACCESS_TOKEN_LIFETIME_MINUTES = 15
 REFRESH_TOKEN_LIFETIME_DAYS = 7
 
