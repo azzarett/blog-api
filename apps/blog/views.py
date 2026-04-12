@@ -44,6 +44,8 @@ from apps.users.serializers import (
     MessageSerializer,
     ValidationErrorResponseSerializer,
 )
+from apps.blog.tasks import invalidate_posts_cache
+from apps.notifications.tasks import process_new_comment
 
 User = get_user_model()
 
@@ -377,6 +379,15 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer) -> None:
         serializer.save(author=self.request.user)
+        invalidate_posts_cache.delay()
+
+    def perform_update(self, serializer) -> None:
+        serializer.save()
+        invalidate_posts_cache.delay()
+
+    def perform_destroy(self, instance: Post) -> None:
+        instance.delete()
+        invalidate_posts_cache.delay()
 
 
 @extend_schema_view(
@@ -669,7 +680,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer) -> None:
         post = self._get_visible_post()
-        serializer.save(author=self.request.user, post=post)
+        comment = serializer.save(author=self.request.user, post=post)
+        process_new_comment.delay(comment_id=comment.id)
 
 
 class StatsAPIView(APIView):
