@@ -10,7 +10,7 @@ from rest_framework.routers import DefaultRouter
 from django.contrib import admin
 from django.urls import include, path
 
-from apps.blog.views import CommentViewSet, PostViewSet, StatsAPIView
+from apps.blog.views import CommentViewSet, PostStreamAPIView, PostViewSet, StatsAPIView
 from apps.users.views import (
     DocumentedTokenObtainPairView,
     DocumentedTokenRefreshView,
@@ -29,6 +29,7 @@ SCHEMA_PATH = 'api/schema/'
 SWAGGER_PATH = 'api/docs/'
 REDOC_PATH = 'api/redoc/'
 STATS_PATH = 'api/stats/'
+POSTS_STREAM_PATH = 'api/posts/stream/'
 REGISTER_NAME = 'auth_register'
 TOKEN_OBTAIN_NAME = 'auth_token_obtain_pair'
 TOKEN_REFRESH_NAME = 'auth_token_refresh'
@@ -38,6 +39,7 @@ SCHEMA_NAME = 'api_schema'
 SWAGGER_NAME = 'api_swagger_ui'
 REDOC_NAME = 'api_redoc'
 STATS_NAME = 'api_stats'
+POSTS_STREAM_NAME = 'posts_stream'
 
 REGISTER_ACTION_MAP = {'post': 'create'}
 
@@ -77,6 +79,7 @@ urlpatterns = [
         UpdateTimezoneAPIView.as_view(),
         name=UPDATE_TIMEZONE_NAME,
     ),
+    path(POSTS_STREAM_PATH, PostStreamAPIView.as_view(), name=POSTS_STREAM_NAME),
     path(STATS_PATH, StatsAPIView.as_view(), name=STATS_NAME),
     path(SCHEMA_PATH, SpectacularAPIView.as_view(), name=SCHEMA_NAME),
     path(

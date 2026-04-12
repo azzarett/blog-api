@@ -1,6 +1,7 @@
 # pyright: reportIncompatibleMethodOverride=false
 
 import asyncio
+import json
 import hashlib
 
 from drf_spectacular.utils import (
@@ -21,8 +22,10 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import Q
+from django.http import StreamingHttpResponse
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
+from channels.layers import get_channel_layer
 
 from apps.blog.models import Comment, Post
 from apps.blog.permissions import IsAuthorOrReadOnly
@@ -61,6 +64,7 @@ WRITE_ACTIONS = {
 }
 POSTS_LIST_CACHE_VERSION_KEY = 'posts:list:version'
 POSTS_LIST_CACHE_TIMEOUT_SECONDS = 300
+POST_PUBLICATIONS_GROUP = 'post_publications'
 
 
 @extend_schema_view(
@@ -759,3 +763,45 @@ class StatsAPIView(APIView):
         current_time = str(time_payload['datetime'])
 
         return exchange_rates, current_time
+
+
+class PostStreamAPIView(APIView):
+    permission_classes = (AllowAny,)
+
+    @extend_schema(
+        tags=['Posts'],
+        summary='Stream published posts (SSE)',
+        description=(
+            'Streams post publication events via Server-Sent Events. SSE is a good '
+            'fit for one-way server -> client updates and is simpler/cheaper than '
+            'WebSocket here; use WebSocket when bidirectional communication is needed.'
+        ),
+        responses={200: OpenApiResponse(description='SSE stream response.')},
+    )
+    async def get(self, request, *args, **kwargs):
+        response = StreamingHttpResponse(
+            self._stream_post_publications(),
+            content_type='text/event-stream',
+        )
+        response['Cache-Control'] = 'no-cache'
+        response['X-Accel-Buffering'] = 'no'
+        return response
+
+    async def _stream_post_publications(self):
+        channel_layer = get_channel_layer()
+        if channel_layer is None:
+            return
+
+        channel_name = await channel_layer.new_channel('sse.posts.')
+        await channel_layer.group_add(POST_PUBLICATIONS_GROUP, channel_name)
+
+        try:
+            while True:
+                message = await channel_layer.receive(channel_name)
+                payload = message.get('payload')
+                if payload is None:
+                    continue
+
+                yield f'data: {json.dumps(payload, ensure_ascii=False)}\n\n'
+        finally:
+            await channel_layer.group_discard(POST_PUBLICATIONS_GROUP, channel_name)
