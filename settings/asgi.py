@@ -1,20 +1,19 @@
 import os
 
 from django.core.asgi import get_asgi_application
-from channels.routing import ProtocolTypeRouter, URLRouter
 
-import apps.notifications.routing
+# ❗ ЖЁСТКО задаём settings (не setdefault)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings.env.prod'
 
-DJANGO_SETTINGS_MODULE_KEY = 'DJANGO_SETTINGS_MODULE'
-DEFAULT_SETTINGS_MODULE = 'settings.env.local'
-
-os.environ.setdefault(DJANGO_SETTINGS_MODULE_KEY, DEFAULT_SETTINGS_MODULE)
-
+# ❗ сначала инициализация Django
 django_asgi_app = get_asgi_application()
+
+# ❗ только ПОСЛЕ этого импортируем Channels stuff
+from channels.routing import ProtocolTypeRouter, URLRouter
+import apps.notifications.routing
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
-
     "websocket": URLRouter(
         apps.notifications.routing.websocket_urlpatterns
     ),
