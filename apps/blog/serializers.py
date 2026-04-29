@@ -44,7 +44,15 @@ class PostListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('slug', 'title', 'status', 'created_at', 'updated_at', 'author')
+        fields = (
+            'slug',
+            'title',
+            'status',
+            'publish_at',
+            'created_at',
+            'updated_at',
+            'author',
+        )
 
     def get_created_at(self, obj: Post) -> str:
         return self._format_datetime(obj.created_at)
@@ -79,6 +87,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'title',
             'body',
             'status',
+            'publish_at',
             'category',
             'tags',
             'created_at',
@@ -121,7 +130,7 @@ class PostWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('title', 'slug', 'body', 'category', 'tags', 'status')
+        fields = ('title', 'slug', 'body', 'category', 'tags', 'status', 'publish_at')
 
 
 class CommentSerializer(serializers.ModelSerializer):

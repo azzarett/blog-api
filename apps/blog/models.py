@@ -14,6 +14,7 @@ AUTHOR_COMMENTS_RELATED_NAME = 'comments'
 
 DRAFT_STATUS = 'draft'
 PUBLISHED_STATUS = 'published'
+SCHEDULED_STATUS = 'scheduled'
 
 
 class Category(models.Model):
@@ -69,6 +70,7 @@ class Tag(models.Model):
 class Post(models.Model):
     class Status(models.TextChoices):
         DRAFT = DRAFT_STATUS, 'Draft'
+        SCHEDULED = SCHEDULED_STATUS, 'Scheduled'
         PUBLISHED = PUBLISHED_STATUS, 'Published'
 
     author = models.ForeignKey(
@@ -99,6 +101,11 @@ class Post(models.Model):
         choices=Status.choices,
         default=Status.DRAFT,
         verbose_name=_('Status'),
+    )
+    publish_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Publish at'),
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Created at'))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_('Updated at'))

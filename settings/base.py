@@ -8,7 +8,10 @@ from settings.conf import (
     BLOG_REDIS_URL,
     BLOG_SECRET_KEY,
     BLOG_TIME_ZONE,
+    BLOG_CELERY_BROKER_URL,
 )
+
+CHANNELS = 'channels'
 
 DJANGO_ADMIN_APP = 'django.contrib.admin'
 DJANGO_AUTH_APP = 'django.contrib.auth'
@@ -22,6 +25,7 @@ DRF_SPECTACULAR_APP = 'drf_spectacular'
 USERS_APP = 'apps.users'
 BLOG_APP = 'apps.blog'
 CORE_APP = 'apps.core'
+NOTIFICATIONS_APP = 'apps.notifications'
 
 ROOT_URLCONF_MODULE = 'settings.urls'
 WSGI_APPLICATION_MODULE = 'settings.wsgi.application'
@@ -54,8 +58,20 @@ NUMERIC_PASSWORD_VALIDATOR = (
     'django.contrib.auth.password_validation.NumericPasswordValidator'
 )
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [BLOG_REDIS_URL],
+        },
+    },
+}
+
 ACCESS_TOKEN_LIFETIME_MINUTES = 15
 REFRESH_TOKEN_LIFETIME_DAYS = 7
+
+CELERY_BROKER_URL = BLOG_CELERY_BROKER_URL
+CELERY_RESULT_BACKEND = BLOG_CELERY_BROKER_URL
 
 SECRET_KEY = BLOG_SECRET_KEY
 DEBUG = False
@@ -73,6 +89,8 @@ INSTALLED_APPS = [
     CORE_APP,
     USERS_APP,
     BLOG_APP,
+    CHANNELS,
+    NOTIFICATIONS_APP,
 ]
 
 MIDDLEWARE = [

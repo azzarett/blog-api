@@ -29,7 +29,7 @@ from apps.users.serializers import (
     UpdateTimezoneSerializer,
     ValidationErrorResponseSerializer,
 )
-from apps.users.services import send_welcome_email
+from apps.users.tasks import send_welcome_email
 
 REGISTER_SUCCESS_STATUS = status.HTTP_201_CREATED
 UPDATE_SUCCESS_STATUS = status.HTTP_200_OK
@@ -92,7 +92,7 @@ class RegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        send_welcome_email(user)
+        send_welcome_email.delay(user.id)
 
         payload = RegisterResponseSerializer.build_payload(user)
         response_serializer = RegisterResponseSerializer(instance=payload)
